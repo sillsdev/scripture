@@ -1,3 +1,7 @@
+# compliled output
+/lib
+*.tgz
+
 # Logs
 logs
 *.log
