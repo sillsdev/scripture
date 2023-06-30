@@ -1,7 +1,5 @@
 # scripture
 
-TypeScript partial port of [libpalaso/SIL.Scripture][github-libpalaso-scripture].
-
 <div align="center">
 
 [![Build Status][github-actions-status]][github-actions-url]
@@ -9,6 +7,15 @@ TypeScript partial port of [libpalaso/SIL.Scripture][github-libpalaso-scripture]
 [![Github Tag][github-tag-image]][github-tag-url]
 
 </div>
+
+TypeScript partial port of C# library [libpalaso/SIL.Scripture][github-libpalaso-scripture]. These libraries are used by [Paratext](https://paratext.org/) to represent Scripture.
+
+## Features
+
+- {class} Canon - Canon information. Also, contains static information on complete list of books.
+- {class} VerseRef - Stores a reference to a specific verse in Scripture.
+  - Represents single references and ranges, such as: GEN 2:3, LUK 3:4b-5a
+  - Supports versification types: Unknown, Original, Septuagint, Vulgate, English, RussianProtestant, RussianOrthodox.
 
 ## Installation
 

@@ -12,6 +12,10 @@ module.exports = {
     'plugin:@typescript-eslint/strict',
     'prettier',
   ],
+  env: {
+    browser: true,
+    node: true,
+  },
   rules: {
     '@typescript-eslint/no-unused-vars': [
       'warn',
