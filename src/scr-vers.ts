@@ -46,11 +46,8 @@ export class ScrVers {
     return this._type;
   }
 
-  clearExcludedVerses(): void {
-    // do nothing
-  }
-
-  clearVerseSegments(): void {
-    // do nothing
+  equals(scrVers: ScrVers): boolean {
+    if (!scrVers.type || !this.type) return false;
+    return scrVers.type === this.type;
   }
 }

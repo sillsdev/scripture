@@ -384,7 +384,9 @@ export class VerseRef {
       verseRef._chapterNum === this._chapterNum &&
       verseRef._verseNum === this._verseNum &&
       verseRef._verse === this._verse &&
-      verseRef.versification === this.versification
+      verseRef.versification != null &&
+      this.versification != null &&
+      verseRef.versification.equals(this.versification)
     );
   }
 
