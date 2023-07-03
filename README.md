@@ -14,7 +14,8 @@ TypeScript partial port of C# library [libpalaso/SIL.Scripture][github-libpalaso
 
 - {class} Canon - Canon information. Also, contains static information on complete list of books.
 - {class} VerseRef - Stores a reference to a specific verse in Scripture.
-  - Represents single references and ranges, such as: GEN 2:3, LUK 3:4b-5a
+  - Represents a single reference, e.g. GEN 2:3
+  - Represents a reference range, e.g. LUK 3:4b-5a
   - Supports versification types: Unknown, Original, Septuagint, Vulgate, English, RussianProtestant, RussianOrthodox.
 
 ## Installation

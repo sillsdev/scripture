@@ -1,15 +1,16 @@
 {
   "name": "@sillsdev/scripture",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "TypeScript partial port of `libpalaso/SIL.Scripture`",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "tsc --project tsconfig.build.json && vite build && dts-bundle-generator --config ./dts-bundle-generator.config.ts",
+    "build": "tsc --project tsconfig.build.json && vite build && dts-bundle-generator --config ./dts-bundle-generator.config.ts && npm run prettier:dts",
     "prepare": "npm run build",
     "prettier": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
+    "prettier:dts": "prettier --write \"dist/**/*.d.ts\"",
     "prettier:ci": "prettier --list-different \"**/*.{ts,js,json,md,yml}\"",
     "test:ci": "jest --config jest.config.js --ci --reporters=jest-junit --coverage",
     "lint": "eslint . --max-warnings 0"
@@ -32,8 +33,8 @@
   "homepage": "https://github.com/sillsdev/scripture#readme",
   "devDependencies": {
     "@types/jest": "^29.5.2",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
     "dts-bundle-generator": "^7.2.0",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",

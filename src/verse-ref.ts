@@ -16,12 +16,23 @@ function splitMulti(str: string, tokens: string[]): string[] {
 }
 
 /**
+ * The valid status of the VerseRef
+ */
+enum ValidStatusType {
+  Valid,
+  UnknownVersification,
+  OutOfRange,
+  VerseOutOfOrder,
+  VerseRepeated,
+}
+
+/**
  * Stores a reference to a specific verse in Scripture.
  */
 export class VerseRef {
+  static readonly defaultVersification: ScrVers = ScrVers.English;
   static readonly verseRangeSeparator = '-';
   static readonly verseSequenceIndicator = ',';
-  static readonly defaultVersification: ScrVers = ScrVers.English;
   static readonly verseRangeSeparators: string[] = [VerseRef.verseRangeSeparator];
   static readonly verseSequenceIndicators: string[] = [VerseRef.verseSequenceIndicator];
 
@@ -29,6 +40,11 @@ export class VerseRef {
   private static readonly bookDigitShifter: number =
     VerseRef.chapterDigitShifter * VerseRef.chapterDigitShifter;
   private static readonly bcvMaxValue: number = VerseRef.chapterDigitShifter - 1;
+
+  /**
+   * The valid status of the VerseRef
+   */
+  static ValidStatusType = ValidStatusType;
 
   static parse(verseStr: string, versification: ScrVers = VerseRef.defaultVersification): VerseRef {
     const vref = new VerseRef(undefined, undefined, undefined, versification);
@@ -50,7 +66,7 @@ export class VerseRef {
 
   /**
    * Tries to parse the specified string into a verse reference
-   * @param string str The string to attempt to parse
+   * @param str - The string to attempt to parse
    * @returns success: True if the specified string was successfully parsed, false otherwise
    * @returns verseRef: The result of the parse if successful, or empty VerseRef if it failed
    */
@@ -78,7 +94,7 @@ export class VerseRef {
 
   /**
    * Parses a verse string and gets the leading numeric portion as a number.
-   * @param string verseStr
+   * @param verseStr - verse string to parse
    * @returns true if the entire string could be parsed as a single, simple verse number (1-999);
    *    false if the verse string represented a verse bridge, contained segment letters, or was invalid
    */
@@ -117,14 +133,13 @@ export class VerseRef {
   text?: string;
   BBBCCCVVVS?: string;
   longHashCode?: number;
-  versificationStr?: string;
+  versification?: ScrVers;
 
   private readonly rtlMark: string = '\u200f';
   private _bookNum = 0;
   private _chapterNum = 0;
   private _verseNum = 0;
   private _verse?: string;
-  private _versification?: ScrVers;
 
   constructor(
     book?: number | string,
@@ -148,12 +163,12 @@ export class VerseRef {
       } else {
         this._verseNum = verse;
       }
-      this._versification = versification != null ? versification : VerseRef.defaultVersification;
+      this.versification = versification != null ? versification : VerseRef.defaultVersification;
     } else if (versification != null) {
       this._bookNum = 0;
       this._chapterNum = -1;
       this._verseNum = -1;
-      this._versification = versification;
+      this.versification = versification;
     }
   }
 
@@ -237,11 +252,11 @@ export class VerseRef {
     this._verseNum = value;
   }
 
-  get versification(): ScrVers | undefined {
-    return this._versification;
+  get versificationStr(): string | undefined {
+    return this.versification?.name;
   }
-  set versification(value: ScrVers | undefined) {
-    this._versification = value;
+  set versificationStr(value: string | undefined) {
+    this.versification = this.versification != null ? new ScrVers(value) : undefined;
   }
 
   /**
@@ -293,8 +308,8 @@ export class VerseRef {
    * - invalid book name
    * - chapter number is missing or not a number
    * - verse number is missing or does not start with a number
-   * - versifcation is invalid
-   * @param string verseStr string to parse e.g. "MAT 3:11"
+   * - versification is invalid
+   * @param verseStr - string to parse e.g. "MAT 3:11"
    */
   parse(verseStr: string): void {
     verseStr = verseStr.replace(this.rtlMark, '');
@@ -343,14 +358,14 @@ export class VerseRef {
   /**
    * Makes a clone of the reference.
    *
-   * @returns {VerseRef} The clone.
+   * @returns The cloned VerseRef.
    */
   clone(): VerseRef {
     return new VerseRef(
       this._bookNum,
       this._chapterNum,
       this._verse == null ? this._verseNum : this._verse,
-      this._versification
+      this.versification
     );
   }
 
@@ -369,7 +384,7 @@ export class VerseRef {
       verseRef._chapterNum === this._chapterNum &&
       verseRef._verseNum === this._verseNum &&
       verseRef._verse === this._verse &&
-      verseRef._versification === this._versification
+      verseRef.versification === this.versification
     );
   }
 
@@ -381,11 +396,13 @@ export class VerseRef {
    * GEN 1:1a-3b,5 returns GEN 1:1a, GEN 1:2, GEN 1:3b, GEN 1:5
    * GEN 1:2a-2c returns //! ??????
    *
-   * @param {boolean} [specifiedVersesOnly=false] if set to <c>true</c> return only verses that are explicitly specified
-   * only, not verses within a range.
-   * @param {string[]} [verseRangeSeparators=VerseRef.verseRangeSeparators] Verse range separators.
-   * @param {string[]} [verseSequenceSeparators=VerseRef.verseSequenceIndicators] Verse sequence separators.
-   * @returns {VerseRef[]} All verses in this VerseRef.
+   * @param specifiedVersesOnly - if set to <c>true</c> return only verses that are
+   * explicitly specified only, not verses within a range. Defaults to `false`.
+   * @param verseRangeSeparators - Verse range separators.
+   * Defaults to `VerseRef.verseRangeSeparators`.
+   * @param verseSequenceSeparators - Verse sequence separators.
+   * Defaults to `VerseRef.verseSequenceIndicators`.
+   * @returns An array of all single verse references in this VerseRef.
    */
   allVerses(
     specifiedVersesOnly = false,
@@ -415,7 +432,7 @@ export class VerseRef {
               this._bookNum,
               this._chapterNum,
               verseNum,
-              this._versification
+              this.versification
             );
             if (!this.isExcluded) {
               verseRefs.push(verseInRange);
@@ -462,7 +479,7 @@ export class VerseRef {
    */
   private get internalValid(): ValidStatusType {
     // Unknown versification is always invalid
-    if (this._versification == null) {
+    if (this.versification == null) {
       return ValidStatusType.UnknownVersification;
     }
 
@@ -497,14 +514,3 @@ export class VerseRef {
 }
 
 export class VerseRefException extends Error {}
-
-/**
- * The valid status of the VerseRef
- */
-export enum ValidStatusType {
-  Valid,
-  UnknownVersification,
-  OutOfRange,
-  VerseOutOfOrder,
-  VerseRepeated,
-}

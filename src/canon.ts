@@ -321,8 +321,8 @@ export class Canon {
   /**
    * Gets the 1-based number of the specified book
    * This is a fairly performance-critical method.
-   * @param string id
-   * @param boolean ignoreCase
+   * @param id - book ID
+   * @param ignoreCase - should case be ignored. Defaults to `true`.
    * @returns book number, or 0 if id doesn't exist
    */
   static bookIdToNumber(id: string, ignoreCase = true): number {
@@ -337,8 +337,9 @@ export class Canon {
 
   /**
    * Gets the id if a book based on its 1-based number
-   * @param number number Book number (this is 1-based, not an index)
-   * @param string errorValue The string to return if the book number does not correspond to a valid book
+   * @param number - Book number (this is 1-based, not an index)
+   * @param errorValue - The string to return if the book number does not correspond to a valid book.
+   * Defaults to `'***'`.
    */
   static bookNumberToId(number: number, errorValue = '***'): string {
     const index: number = number - 1;

@@ -1,7 +1,9 @@
 import { ScrVers } from './scr-vers';
 import { VerseRef } from './verse-ref';
 
-describe('VerseRef constructor', () => {
+describe('VerseRef Constructor', () => {
+  const RTL_MARKER = '\u200F';
+
   it('should construct with versification', () => {
     const vref = new VerseRef(1, 2, 3, ScrVers.Septuagint);
     expect(vref.valid).toBe(true);
@@ -43,6 +45,20 @@ describe('VerseRef constructor', () => {
 
   it('should construct with a verse range', () => {
     const vref = new VerseRef('LUK', '3', '4b-5a', ScrVers.Vulgate);
+    expect(vref.valid).toBe(true);
+    expect(vref.BBBCCCVVV).toEqual(42003004);
+    // expect(vref.BBBCCCVVVS).toEqual('042003004b');
+    expect(vref.bookNum).toEqual(42);
+    expect(vref.chapterNum).toEqual(3);
+    expect(vref.verseNum).toEqual(4);
+    expect(vref.verse).toEqual('4b-5a');
+    // expect(vref.segment()).toEqual('b');
+    expect(vref.allVerses().length).toEqual(2);
+    expect(vref.versification).toEqual(ScrVers.Vulgate);
+  });
+
+  it('should construct with a verse range and removes RTL marker', () => {
+    const vref = new VerseRef('LUK', '3', '4b' + RTL_MARKER + '-5a', ScrVers.Vulgate);
     expect(vref.valid).toBe(true);
     expect(vref.BBBCCCVVV).toEqual(42003004);
     // expect(vref.BBBCCCVVVS).toEqual('042003004b');
