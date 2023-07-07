@@ -47,7 +47,7 @@ export class VerseRef {
   static ValidStatusType = ValidStatusType;
 
   static parse(verseStr: string, versification: ScrVers = VerseRef.defaultVersification): VerseRef {
-    const vref = new VerseRef(undefined, undefined, undefined, versification);
+    const vref = new VerseRef(versification);
     vref.parse(verseStr);
     return vref;
   }
@@ -141,34 +141,68 @@ export class VerseRef {
   private _verseNum = 0;
   private _verse?: string;
 
+  constructor(verseStr: string, versification?: ScrVers);
+  constructor(verseRef: VerseRef);
+  constructor(versification?: ScrVers);
+  constructor(book: string, chapter: string, verse: string, versification?: ScrVers);
+  constructor(bookNum: number, chapterNum: number, verseNum: number, versification?: ScrVers);
   constructor(
-    book?: number | string,
-    chapter?: number | string,
+    bookEtc?: number | string | ScrVers | VerseRef,
+    chapterEtc?: number | string | ScrVers,
     verse?: number | string,
     versification?: ScrVers
   ) {
-    if (book != null && chapter != null && verse != null) {
-      if (typeof book === 'string') {
-        this.book = book;
+    if (verse == null && versification == null) {
+      if (bookEtc != null && typeof bookEtc === 'string') {
+        // constructor(verseStr: string, versification?: ScrVers);
+        const _verserStr: string = bookEtc;
+        const _versification: ScrVers | undefined =
+          chapterEtc != null && chapterEtc instanceof ScrVers ? chapterEtc : undefined;
+        this.setEmpty(_versification);
+        this.parse(_verserStr);
+      } else if (chapterEtc == null) {
+        if (bookEtc != null && bookEtc instanceof VerseRef) {
+          // constructor(verseRef: VerseRef);
+          const _verseRef: VerseRef = bookEtc;
+          this._bookNum = _verseRef.bookNum;
+          this._chapterNum = _verseRef.chapterNum;
+          this._verseNum = _verseRef.verseNum;
+          this._verse = _verseRef.verse;
+          this.versification = _verseRef.versification;
+        } else {
+          // constructor(versification?: ScrVers);
+          if (bookEtc == null) return;
+          const _versification: ScrVers =
+            bookEtc instanceof ScrVers ? bookEtc : VerseRef.defaultVersification;
+          this.setEmpty(_versification);
+        }
       } else {
-        this._bookNum = book;
+        throw new Error('VerseRef constructor not supported.');
       }
-      if (typeof chapter === 'string') {
-        this.chapter = chapter;
-      } else {
-        this._chapterNum = chapter;
-      }
-      if (typeof verse === 'string') {
-        this.verse = verse;
-      } else {
+    } else if (bookEtc != null && chapterEtc != null && verse != null) {
+      if (
+        typeof bookEtc === 'string' &&
+        typeof chapterEtc === 'string' &&
+        typeof verse === 'string'
+      ) {
+        // constructor(book: string, chapter: string, verse: string, versification?: ScrVers);
+        this.setEmpty(versification);
+        this.updateInternal(bookEtc, chapterEtc, verse);
+      } else if (
+        typeof bookEtc === 'number' &&
+        typeof chapterEtc === 'number' &&
+        typeof verse === 'number'
+      ) {
+        // constructor(bookNum: number, chapterNum: number, verseNum: number, versification?: ScrVers);
+        this._bookNum = bookEtc;
+        this._chapterNum = chapterEtc;
         this._verseNum = verse;
+        this.versification = versification != null ? versification : VerseRef.defaultVersification;
+      } else {
+        throw new Error('VerseRef constructor not supported.');
       }
-      this.versification = versification != null ? versification : VerseRef.defaultVersification;
-    } else if (versification != null) {
-      this._bookNum = 0;
-      this._chapterNum = -1;
-      this._verseNum = -1;
-      this.versification = versification;
+    } else {
+      throw new Error('VerseRef constructor not supported.');
     }
   }
 
@@ -361,12 +395,7 @@ export class VerseRef {
    * @returns The cloned VerseRef.
    */
   clone(): VerseRef {
-    return new VerseRef(
-      this._bookNum,
-      this._chapterNum,
-      this._verse == null ? this._verseNum : this._verse,
-      this.versification
-    );
+    return new VerseRef(this);
   }
 
   toString(): string {
@@ -506,6 +535,13 @@ export class VerseRef {
     return this._versification.isExcluded(this.BBBCCCVVV) ? ValidStatusType.OutOfRange : ValidStatusType.Valid;
     */
     return ValidStatusType.Valid;
+  }
+
+  private setEmpty(versification: ScrVers = VerseRef.defaultVersification) {
+    this._bookNum = 0;
+    this._chapterNum = -1;
+    this._verse = undefined;
+    this.versification = versification;
   }
 
   private updateInternal(bookStr: string, chapterStr: string, verseStr: string): void {
