@@ -46,6 +46,10 @@ export class VerseRef {
    */
   static ValidStatusType = ValidStatusType;
 
+  /**
+   * @deprecated Will be removed in v2. Replace `VerseRef.parse('...')` with `new VerseRef('...')`
+   * or refactor to use `VerseRef.tryParse('...')` which has a different return type.
+   */
   static parse(verseStr: string, versification: ScrVers = VerseRef.defaultVersification): VerseRef {
     const vref = new VerseRef(versification);
     vref.parse(verseStr);
