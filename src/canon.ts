@@ -6,11 +6,11 @@
 /**
  * Canon information. Also, contains static information on complete list of books and localization.
  */
-// This class is only partially converted and won't always contain only static properties.
+// TODO: This class is only partially converted. Work out if we should use an object or a module?
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export class Canon {
+export abstract class Canon {
   /**
-   * Array of all book ids.
+   * Array of all book IDs.
    *  BE SURE TO UPDATE ISCANONICAL above whenever you change this array.
    */
   static readonly allBookIds: string[] = [
@@ -151,6 +151,7 @@ export class Canon {
     'LAO',
   ];
 
+  /** Array of all non-canonical book IDs. */
   static readonly nonCanonicalIds: string[] = [
     'XXA',
     'XXB',
@@ -173,7 +174,7 @@ export class Canon {
   static readonly lastBook = Canon.allBookIds.length;
 
   /**
-   * Array of the English names of all books
+   * Array of the English names of all books.
    */
   private static readonly allBookEnglishNames: string[] = [
     'Genesis',
@@ -315,15 +316,15 @@ export class Canon {
     'Laodiceans',
   ];
 
-  // Used for fast look up of book IDs to the book number
+  // Used for fast look up of book IDs to the book number.
   private static readonly bookNumbers: BookNumbers = Canon.createBookNumbers();
 
   /**
-   * Gets the 1-based number of the specified book
+   * Gets the 1-based number of the specified book.
    * This is a fairly performance-critical method.
-   * @param id - book ID
+   * @param id - 3-letter book ID, e.g. `'MAT'`.
    * @param ignoreCase - should case be ignored. Defaults to `true`.
-   * @returns book number, or 0 if id doesn't exist
+   * @returns book number, or 0 if ID doesn't exist.
    */
   static bookIdToNumber(id: string, ignoreCase = true): number {
     if (ignoreCase) {
@@ -336,10 +337,11 @@ export class Canon {
   }
 
   /**
-   * Gets the id if a book based on its 1-based number
-   * @param number - Book number (this is 1-based, not an index)
+   * Gets the ID of a book from its book number.
+   * @param number - Book number (this is 1-based, not an index).
    * @param errorValue - The string to return if the book number does not correspond to a valid book.
    * Defaults to `'***'`.
+   * @returns The 3-letter `bookId` if found, or the `errorValue` otherwise.
    */
   static bookNumberToId(number: number, errorValue = '***'): string {
     const index: number = number - 1;
@@ -351,6 +353,11 @@ export class Canon {
     return Canon.allBookIds[index];
   }
 
+  /**
+   * Gets the English book name from its book number.
+   * @param number - Book number (this is 1-based, not an index).
+   * @returns The English name of the book if found, or `'******'` otherwise.
+   */
   static bookNumberToEnglishName(number: number): string {
     if (number <= 0 || number > this.lastBook) {
       return '******';
@@ -359,10 +366,20 @@ export class Canon {
     return Canon.allBookEnglishNames[number - 1];
   }
 
+  /**
+   * Gets the English book name from its book ID.
+   * @param id - 3-letter book ID, e.g. `'MAT'`.
+   * @returns The English name of the book if found, or `'******'` otherwise.
+   */
   static bookIdToEnglishName(id: string): string {
     return this.bookNumberToEnglishName(this.bookIdToNumber(id));
   }
 
+  /**
+   *
+   * @param bookNum - Book number (this is 1-based, not an index).
+   * @returns `true` if the book is obsolete, or `false` otherwise.
+   */
   static isObsolete(bookNum: number): boolean {
     const name: string = this.allBookEnglishNames[bookNum - 1];
     return name.includes('*obsolete*');

@@ -8,7 +8,8 @@ import { ScrVers } from './scr-vers';
 import { ScrVersType } from './versification';
 
 function splitMulti(str: string, tokens: string[]): string[] {
-  const tempChar = tokens[0]; // We can use the first token as a temporary join character
+  // We can use the first token as a temporary join character.
+  const tempChar = tokens[0];
   for (let i = 1; i < tokens.length; i++) {
     str = str.split(tokens[i]).join(tempChar);
   }
@@ -16,7 +17,7 @@ function splitMulti(str: string, tokens: string[]): string[] {
 }
 
 /**
- * The valid status of the VerseRef
+ * The valid status of the VerseRef.
  */
 enum ValidStatusType {
   Valid,
@@ -42,7 +43,7 @@ export class VerseRef {
   private static readonly bcvMaxValue: number = VerseRef.chapterDigitShifter - 1;
 
   /**
-   * The valid status of the VerseRef
+   * The valid status of the VerseRef.
    */
   static ValidStatusType = ValidStatusType;
 
@@ -69,9 +70,9 @@ export class VerseRef {
   }
 
   /**
-   * Tries to parse the specified string into a verse reference
-   * @param str - The string to attempt to parse
-   * @returns success: True if the specified string was successfully parsed, false otherwise
+   * Tries to parse the specified string into a verse reference.
+   * @param str - The string to attempt to parse.
+   * @returns success: `true` if the specified string was successfully parsed, `false` otherwise.
    * @returns verseRef: The result of the parse if successful, or empty VerseRef if it failed
    */
   static tryParse(str: string): { success: boolean; verseRef: VerseRef } {
@@ -88,6 +89,15 @@ export class VerseRef {
     }
   }
 
+  /**
+   * Gets the reference as a comparable integer where the book, chapter, and verse each occupy 3
+   * digits.
+   * @param bookNum - Book number (this is 1-based, not an index).
+   * @param chapterNum - Chapter number.
+   * @param verseNum - Verse number.
+   * @returns The reference as a comparable integer where the book, chapter, and verse each occupy 3
+   * digits.
+   */
   static getBBBCCCVVV(bookNum: number, chapterNum: number, verseNum: number): number {
     return (
       (bookNum % VerseRef.bcvMaxValue) * VerseRef.bookDigitShifter +
@@ -137,6 +147,7 @@ export class VerseRef {
   text?: string;
   BBBCCCVVVS?: string;
   longHashCode?: number;
+  /** The versification of the reference. */
   versification?: ScrVers;
 
   private readonly rtlMark: string = '\u200f';
@@ -222,6 +233,9 @@ export class VerseRef {
     );
   }
 
+  /**
+   * Gets whether the verse contains multiple verses.
+   */
   get hasMultiple(): boolean {
     return (
       this._verse != null &&
@@ -230,6 +244,10 @@ export class VerseRef {
     );
   }
 
+  /**
+   * Gets or sets the book of the reference. Book is the 3-letter abbreviation in capital letters,
+   * e.g. `'MAT'`.
+   */
   get book(): string {
     return Canon.bookNumberToId(this.bookNum, '');
   }
@@ -237,6 +255,9 @@ export class VerseRef {
     this.bookNum = Canon.bookIdToNumber(value);
   }
 
+  /**
+   * Gets or sets the chapter of the reference,. e.g. `'3'`.
+   */
   get chapter(): string {
     return this.isDefault || this._chapterNum < 0 ? '' : this._chapterNum.toString();
   }
@@ -245,6 +266,10 @@ export class VerseRef {
     this._chapterNum = Number.isInteger(chapter) ? chapter : -1;
   }
 
+  /**
+   * Gets or sets the verse of the reference, including range, segments, and sequences, e.g. `'4'`,
+   * or `'4b-5a, 7'`.
+   */
   get verse(): string {
     if (this._verse != null) {
       return this._verse;
@@ -262,6 +287,9 @@ export class VerseRef {
     ({ vNum: this._verseNum } = VerseRef.tryGetVerseNum(this._verse));
   }
 
+  /**
+   * Get or set Book based on book number, e.g. `42`.
+   */
   get bookNum(): number {
     return this._bookNum;
   }
@@ -274,6 +302,9 @@ export class VerseRef {
     this._bookNum = value;
   }
 
+  /**
+   * Gets or sets the chapter number, e.g. `3`. `-1` if not valid.
+   */
   get chapterNum(): number {
     return this._chapterNum;
   }
@@ -282,6 +313,9 @@ export class VerseRef {
     this.chapterNum = value;
   }
 
+  /**
+   * Gets or sets verse start number, e.g. `4`. `-1` if not valid.
+   */
   get verseNum(): number {
     return this._verseNum;
   }
@@ -290,6 +324,11 @@ export class VerseRef {
     this._verseNum = value;
   }
 
+  /**
+   * String representing the versification (should ONLY be used for serialization/deserialization).
+   *
+   * @remarks This is for backwards compatibility when ScrVers was an enumeration.
+   */
   get versificationStr(): string | undefined {
     return this.versification?.name;
   }
@@ -298,7 +337,7 @@ export class VerseRef {
   }
 
   /**
-   * Determines if the reference is valid
+   * Determines if the reference is valid.
    */
   get valid(): boolean {
     return this.validStatus === ValidStatusType.Valid;
@@ -347,7 +386,7 @@ export class VerseRef {
    * - chapter number is missing or not a number
    * - verse number is missing or does not start with a number
    * - versification is invalid
-   * @param verseStr - string to parse e.g. "MAT 3:11"
+   * @param verseStr - string to parse e.g. 'MAT 3:11'
    */
   parse(verseStr: string): void {
     verseStr = verseStr.replace(this.rtlMark, '');
@@ -387,7 +426,7 @@ export class VerseRef {
 
   /**
    * Simplifies this verse ref so that it has no bridging of verses or
-   * verse segments like "1a".
+   * verse segments like `'1a'`.
    */
   simplify(): void {
     this._verse = undefined;
@@ -411,6 +450,11 @@ export class VerseRef {
     return `${book} ${this.chapter}:${this.verse}`;
   }
 
+  /**
+   * Compares this `VerseRef` with supplied one.
+   * @param verseRef - `VerseRef` to compare this one to.
+   * @returns `true` if this `VerseRef` is equal to the supplied on, `false` otherwise.
+   */
   equals(verseRef: VerseRef): boolean {
     return (
       verseRef._bookNum === this._bookNum &&
@@ -523,6 +567,7 @@ export class VerseRef {
       return ValidStatusType.OutOfRange;
     }
 
+    // TODO: Finish the rest of the port required to uncomment the section below.
     // If non-biblical book, any chapter/verse is valid
     /*
     if (!Canon.isCanonical(this._bookNum)) {
