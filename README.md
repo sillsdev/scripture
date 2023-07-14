@@ -9,7 +9,7 @@
 
 </div>
 
-TypeScript partial port of the C# library [libpalaso/SIL.Scripture][github-libpalaso-scripture]. These libraries are used by [Paratext](https://paratext.org/) to represent and support Scripture references.
+TypeScript partial port of the C# library [libpalaso/SIL.Scripture][github-libpalaso-scripture]. These libraries are used by [Paratext](https://paratext.org/) and provides classes for working with Scripture data such as references and versifications.
 
 v1 is a minimal partial port in TypeScript that supports use on the frontend while still using the full C# version on the backend.
 
@@ -18,8 +18,9 @@ v1 is a minimal partial port in TypeScript that supports use on the frontend whi
 - {class} Canon - Canon information. Also, contains static information on complete list of books.
 - {class} VerseRef - Stores a reference to a specific verse in Scripture.
   - Represents a single reference, e.g. `'GEN 2:3'`.
-  - Represents a reference range and segments, e.g. `'LUK 3:4b-5a'`.
-  - Represents a reference sequence and segments, e.g. `'GEN 1:1a-3b,5'`.
+  - Represents a reference range, e.g. `'LUK 3:4-5'`.
+  - Represents a reference sequence, e.g. `'GEN 1:1-3,5'`.
+  - Represents a reference with a segment, e.g. `'LUK 3:4b'`.
   - Validate references.
   - Supports versification types: Unknown, Original, Septuagint, Vulgate, English, RussianProtestant, RussianOrthodox.
 
@@ -113,14 +114,34 @@ Useful static functions:
 ```typescript
 import { Canon } from '@sillsdev/scripture';
 
+console.log(Canon.bookIdToNumber('MAT')); // 40
+
 console.log(Canon.bookNumberToId(1)); // 'GEN'
 console.log(Canon.bookNumberToId(40)); // 'MAT'
-
-console.log(Canon.bookNumberToId('MAT')); // 40
 
 console.log(Canon.bookNumberToEnglishName(1)); // 'Genesis'
 
 console.log(Canon.bookIdToEnglishName('GEN')); // 'Genesis'
+
+console.log(Canon.isBookIdValid('MAT')); // true
+
+console.log(Canon.isBookNT('MAT')); // true
+console.log(Canon.isBookNT(1)); // false
+
+console.log(Canon.isBookOT('MAT')); // false
+console.log(Canon.isBookOT(1)); // true
+
+console.log(Canon.isBookOTNT('MAT')); // true
+console.log(Canon.isBookOTNT(1)); // true
+
+console.log(Canon.isBookDC('TOB')); // true
+console.log(Canon.isBookDC(1)); // false
+
+console.log(Canon.isCanonical('XXA')); // false
+console.log(Canon.isCanonical(1)); // true
+
+console.log(Canon.isExtraMaterial('XXA')); // true
+console.log(Canon.isExtraMaterial(1)); // false
 
 console.log(Canon.isObsolete(87)); // true
 ```

@@ -166,9 +166,6 @@ export const nonCanonicalIds: string[] = [
   'NDX',
 ];
 
-export const firstBook = 1;
-export const lastBook = allBookIds.length;
-
 /** Array of the English names of all books. */
 const allBookEnglishNames: string[] = [
   'Genesis',
@@ -331,6 +328,100 @@ export function bookIdToNumber(id: string, ignoreCase = true): number {
 }
 
 /**
+ * Check if a book ID is valid.
+ * @param id - 3-letter book ID to check, e.g. `'MAT'`.
+ * @returns `true` if book ID is valid, `false` otherwise.
+ */
+export function isBookIdValid(id: string): boolean {
+  return bookIdToNumber(id) > 0;
+}
+
+/**
+ * Check if book ID is in western NT.
+ * @param id - 3-letter book ID, e.g. `'MAT'`
+ * @returns `true` if the book is in the NT, `false` otherwise.
+ */
+export function isBookNT(id: string): boolean;
+/**
+ * Check if book number is in western NT.
+ * @param num - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is in the NT, `false` otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function isBookNT(num: number): boolean;
+export function isBookNT(value: string | number): boolean {
+  const num = typeof value === 'string' ? bookIdToNumber(value) : value;
+  return num >= 40 && num <= 66;
+}
+
+/**
+ * Check if book ID is in Protestant OT.
+ * @param id - 3-letter book ID, e.g. `'MAT'`
+ * @returns `true` if the book is in the OT, `false` otherwise.
+ */
+export function isBookOT(id: string): boolean;
+/**
+ * Check if book number is in Protestant OT.
+ * @param num - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is in the OT, `false` otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function isBookOT(num: number): boolean;
+export function isBookOT(value: string | number): boolean {
+  const num = typeof value === 'string' ? bookIdToNumber(value) : value;
+  return num <= 39;
+}
+
+/**
+ * Check if the book is in either the OT or the NT.
+ * @param num - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is in either the OT or the NT, `false` otherwise.
+ */
+export function isBookOTNT(num: number): boolean {
+  return num <= 66;
+}
+
+/**
+ * Check if book is in Deutero Canon.
+ * @param id - 3-letter book ID, e.g. `'MAT'`
+ * @returns `true` if the book is in the Deutero Canon, `false` otherwise.
+ */
+export function isBookDC(id: string): boolean;
+/**
+ * Check if book is in Deutero Canon.
+ * @param num - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is in the Deutero Canon, `false` otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function isBookDC(num: number): boolean;
+export function isBookDC(value: string | number): boolean {
+  const num = typeof value === 'string' ? bookIdToNumber(value) : value;
+  return isCanonical(num) && !isBookOTNT(num);
+}
+
+/**
+ * Enumerates all book numbers.
+ * @yields The next book number.
+ */
+export function* allBookNumbers(): Generator<number> {
+  for (let i = 1; i <= allBookIds.length; i++) yield i;
+}
+
+/** Index of the first book. Abstracting this makes code less fragile. */
+export const firstBook = 1;
+
+/** Number of the last book (1-based). */
+export const lastBook = allBookIds.length;
+
+/**
+ * Array of extra book IDs.
+ * @returns The array of extra book IDs.
+ */
+export function extraBooks(): string[] {
+  return ['XXA', 'XXB', 'XXC', 'XXD', 'XXE', 'XXF', 'XXG'];
+}
+
+/**
  * Gets the ID of a book from its book number.
  * @param number - Book number (this is 1-based, not an index).
  * @param errorValue - The string to return if the book number does not correspond to a valid book.
@@ -370,6 +461,42 @@ export function bookIdToEnglishName(id: string): string {
 }
 
 /**
+ * Check if this is a canonical book ID, as opposed to front matter etc.
+ * @param id - 3-letter book ID, e.g. `'MAT'`
+ * @returns `true` if the book is canonical, `false` otherwise.
+ */
+export function isCanonical(id: string): boolean;
+/**
+ * Check if this is a canonical book number, as opposed to front matter etc.
+ * @param bookNum - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is canonical, `false` otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function isCanonical(bookNum: number): boolean;
+export function isCanonical(value: string | number): boolean {
+  const id = typeof value === 'number' ? bookNumberToId(value) : value;
+  return isBookIdValid(id) && !nonCanonicalIds.includes(id);
+}
+
+/**
+ * Check if book ID is extra material.
+ * @param id - 3-letter book ID, e.g. `'MAT'`
+ * @returns `true` if the book extra material, `false` otherwise.
+ */
+export function isExtraMaterial(id: string): boolean;
+/**
+ * Check if book number is extra material.
+ * @param bookNum - Book number (this is 1-based, not an index).
+ * @returns `true` if the book is extra material, `false` otherwise.
+ */
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function isExtraMaterial(bookNum: number): boolean;
+export function isExtraMaterial(value: string | number): boolean {
+  const id = typeof value === 'number' ? bookNumberToId(value) : value;
+  return isBookIdValid(id) && nonCanonicalIds.includes(id);
+}
+
+/**
  *
  * @param bookNum - Book number (this is 1-based, not an index).
  * @returns `true` if the book is obsolete, or `false` otherwise.
@@ -393,12 +520,21 @@ function createBookNumbers(): BookNumbers {
 export const Canon = {
   allBookIds,
   nonCanonicalIds,
+  bookIdToNumber,
+  isBookIdValid,
+  isBookNT,
+  isBookOT,
+  isBookOTNT,
+  isBookDC,
+  allBookNumbers,
   firstBook,
   lastBook,
-  bookIdToNumber,
+  extraBooks,
   bookNumberToId,
   bookNumberToEnglishName,
   bookIdToEnglishName,
+  isCanonical,
+  isExtraMaterial,
   isObsolete,
 };
 export default Canon;
