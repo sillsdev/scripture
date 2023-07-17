@@ -53,6 +53,12 @@ console.log(verseRef.chapterNum); // 3
 console.log(verseRef.verse); // '4b-5a'
 console.log(verseRef.verseNum); // 4
 
+// construct from a bbbcccvvv number
+verseRef = new VerseRef(42003004);
+console.log(verseRef.bookNum); // 42
+console.log(verseRef.chapterNum); // 3
+console.log(verseRef.verseNum); // 4
+
 // construct from an existing VerseRef
 verseRef = new VerseRef(verseRef);
 console.log(verseRef.book); // 'LUK'

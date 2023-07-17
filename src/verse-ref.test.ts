@@ -116,7 +116,7 @@ describe('VerseRef', () => {
       expect(vref.allVerses().length).toEqual(2);
       expect(vref.versification).toEqual(ScrVers.Vulgate);
     });
-    /*
+
     it('should construct from BBBCCCVV without versification', () => {
       const vref = new VerseRef(12015013);
       expect(vref.BBBCCCVVV).toEqual(12015013);
@@ -128,7 +128,18 @@ describe('VerseRef', () => {
       expect(vref.verse).toEqual('13');
       expect(vref.versification).toEqual(VerseRef.defaultVersification);
     });
-    */
+
+    it('should construct from BBBCCCVV with versification', () => {
+      const vref = new VerseRef(42003004, ScrVers.Vulgate);
+      expect(vref.BBBCCCVVV).toEqual(42003004);
+      // expect(vref.BBBCCCVVVS).toEqual('042003004');
+      expect(vref.book).toEqual('LUK');
+      expect(vref.bookNum).toEqual(42);
+      expect(vref.chapterNum).toEqual(3);
+      expect(vref.verseNum).toEqual(4);
+      expect(vref.verse).toEqual('4');
+      expect(vref.versification).toEqual(ScrVers.Vulgate);
+    });
   });
 
   describe('Chapter and Verse as Empty Strings', () => {
