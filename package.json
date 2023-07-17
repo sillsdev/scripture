@@ -1,6 +1,6 @@
 {
   "name": "@sillsdev/scripture",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "TypeScript partial port of `libpalaso/SIL.Scripture`",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
