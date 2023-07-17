@@ -156,7 +156,7 @@ export class VerseRef {
   private _verseNum = 0;
   private _verse?: string;
 
-  constructor(verseStr: string, versification?: ScrVers);
+  constructor(verseStr: string | number, versification?: ScrVers);
   constructor(verseRef: VerseRef);
   constructor(versification?: ScrVers);
   constructor(book: string, chapter: string, verse: string, versification?: ScrVers);
@@ -175,6 +175,16 @@ export class VerseRef {
           chapterEtc != null && chapterEtc instanceof ScrVers ? chapterEtc : undefined;
         this.setEmpty(_versification);
         this.parse(_verserStr);
+      } else if (bookEtc != null && typeof bookEtc === 'number') {
+        // constructor(bbbcccvvv: number, versification?: ScrVers);
+        const _versification: ScrVers | undefined =
+          chapterEtc != null && chapterEtc instanceof ScrVers ? chapterEtc : undefined;
+        this.setEmpty(_versification);
+        this._verseNum = bookEtc % VerseRef.chapterDigitShifter;
+        this._chapterNum = Math.floor(
+          (bookEtc % VerseRef.bookDigitShifter) / VerseRef.chapterDigitShifter
+        );
+        this._bookNum = Math.floor(bookEtc / VerseRef.bookDigitShifter);
       } else if (chapterEtc == null) {
         if (bookEtc != null && bookEtc instanceof VerseRef) {
           // constructor(verseRef: VerseRef);
