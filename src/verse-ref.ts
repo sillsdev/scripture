@@ -589,18 +589,19 @@ export class VerseRef {
       return ValidStatusType.Valid;
     }
 
-    // TODO: Finish the rest of the port required to uncomment the section below.
-    /*
-    if (this._bookNum > this._versification.getLastBook() || this._chapterNum <= 0 ||
-      this._chapterNum > this._versification.getLastChapter(this._bookNum) || this.verseNum < 0 ||
-      this.verseNum > this._versification.getLastVerse(this._bookNum, this._chapterNum)
+    if (
+      this._bookNum > this.versification.getLastBook() ||
+      this._chapterNum <= 0 ||
+      this._chapterNum > this.versification.getLastChapter(this._bookNum) ||
+      this.verseNum < 0 ||
+      this.verseNum > this.versification.getLastVerse(this._bookNum, this._chapterNum)
     ) {
       return ValidStatusType.OutOfRange;
     }
 
-    return this._versification.isExcluded(this.BBBCCCVVV) ? ValidStatusType.OutOfRange : ValidStatusType.Valid;
-    */
-    return ValidStatusType.Valid;
+    return this.versification.isExcluded(this.BBBCCCVVV)
+      ? ValidStatusType.OutOfRange
+      : ValidStatusType.Valid;
   }
 
   private setEmpty(versification: ScrVers = VerseRef.defaultVersification) {

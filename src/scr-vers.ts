@@ -4,7 +4,7 @@
  */
 
 import { BookSet } from './book-set';
-import { ScrVersType } from './versification';
+import { ScrVersType, Versification } from './versification';
 
 /**
  * Accessor for getting information about a versification. This class has a small memory footprint
@@ -27,8 +27,8 @@ export class ScrVers {
   baseVersification?: ScrVers;
   scriptureBooks?: BookSet;
 
-  private _type?: ScrVersType;
-  // private versInfo: Versification;
+  private _type: ScrVersType = ScrVersType.Unknown;
+  private _versInfo?: Versification;
 
   constructor(type?: ScrVersType | string) {
     if (type != null) {
@@ -42,8 +42,58 @@ export class ScrVers {
     }
   }
 
-  get type(): ScrVersType | undefined {
+  /**
+   * Gets the type of versification.
+   */
+  get type(): ScrVersType {
     return this._type;
+  }
+
+  /**
+   * Gets the internal versification mapping (should only be called from Versification).
+   *
+   * @internal
+   */
+  get versInfo(): Versification {
+    if (this._versInfo == null) this._versInfo = Versification.Table.Implementation.get(this._type);
+    return this._versInfo;
+  }
+
+  /**
+   * Gets last book in this project.
+   * @returns The last book number in this project.
+   */
+  getLastBook(): number {
+    return this.versInfo.lastBook();
+  }
+
+  /**
+   * Gets last chapter number in this book.
+   * @param bookNum - Book number (this is 1-based, not an index).
+   * @returns The last chapter number in this book.
+   */
+  getLastChapter(bookNum: number): number {
+    return this.versInfo.lastChapter(bookNum);
+  }
+
+  /**
+   * Gets last verse number in this book/chapter.
+   * @param bookNum - Book number (this is 1-based, not an index).
+   * @param chapterNum - Chapter number.
+   * @returns The last verse number in this book/chapter.
+   */
+  getLastVerse(bookNum: number, chapterNum: number): number {
+    return this.versInfo.lastVerse(bookNum, chapterNum);
+  }
+
+  /**
+   * Determines whether the specified verse is excluded in the versification.
+   * @param bbbcccvvv - The reference as a comparable integer where the book, chapter, and verse
+   * each occupy 3 digits.
+   * @returns
+   */
+  isExcluded(bbbcccvvv: number): boolean {
+    return this.versInfo.isExcluded(bbbcccvvv);
   }
 
   equals(scrVers: ScrVers): boolean {

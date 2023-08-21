@@ -21,6 +21,7 @@ v1 is a minimal partial port in TypeScript that supports use on the frontend whi
   - Represents a reference range, e.g. `'LUK 3:4-5'`.
   - Represents a reference sequence, e.g. `'GEN 1:1-3,5'`.
   - Represents a reference with a segment, e.g. `'LUK 3:4b'`.
+  <!-- - Represents a combination of the above, e.g. `'GEN 1:1b-3a,5c,6'`. -->
   - Validate references.
   - Supports versification types: Unknown, Original, Septuagint, Vulgate, English, RussianProtestant, RussianOrthodox.
 
