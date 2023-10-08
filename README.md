@@ -15,7 +15,7 @@ v1 is a minimal partial port in TypeScript that supports use on the frontend whi
 
 ## Features
 
-- {class} Canon - Canon information. Also, contains static information on complete list of books.
+- {object} Canon - Canon information. Also, contains static information on complete list of books.
 - {class} VerseRef - Stores a reference to a specific verse in Scripture.
   - Represents a single reference, e.g. `'GEN 2:3'`.
   - Represents a reference range, e.g. `'LUK 3:4-5'`.

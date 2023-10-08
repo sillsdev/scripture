@@ -140,12 +140,19 @@ export class VerseRef {
     return { success: true, vNum };
   }
 
+  /** Not yet implemented. */
   firstChapter?: number;
+  /** Not yet implemented. */
   lastChapter?: number;
+  /** Not yet implemented. */
   lastVerse?: number;
+  /** Not yet implemented. */
   hasSegmentsDefined?: boolean;
+  /** Not yet implemented. */
   text?: string;
+  /** Not yet implemented. */
   BBBCCCVVVS?: string;
+  /** Not yet implemented. */
   longHashCode?: number;
   /** The versification of the reference. */
   versification?: ScrVers;
@@ -577,13 +584,13 @@ export class VerseRef {
       return ValidStatusType.OutOfRange;
     }
 
-    // TODO: Finish the rest of the port required to uncomment the section below.
     // If non-biblical book, any chapter/verse is valid
-    /*
     if (!Canon.isCanonical(this._bookNum)) {
       return ValidStatusType.Valid;
     }
 
+    // TODO: Finish the rest of the port required to uncomment the section below.
+    /*
     if (this._bookNum > this._versification.getLastBook() || this._chapterNum <= 0 ||
       this._chapterNum > this._versification.getLastChapter(this._bookNum) || this.verseNum < 0 ||
       this.verseNum > this._versification.getLastVerse(this._bookNum, this._chapterNum)
