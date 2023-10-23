@@ -469,15 +469,16 @@ export class VerseRef {
 
   /**
    * Compares this `VerseRef` with supplied one.
-   * @param verseRef - `VerseRef` to compare this one to.
+   * @param verseRef - object to compare this one to.
    * @returns `true` if this `VerseRef` is equal to the supplied on, `false` otherwise.
    */
-  equals(verseRef: VerseRef): boolean {
+  equals(verseRef: object): boolean {
+    if (!(verseRef instanceof VerseRef)) return false;
     return (
       verseRef._bookNum === this._bookNum &&
       verseRef._chapterNum === this._chapterNum &&
       verseRef._verseNum === this._verseNum &&
-      verseRef._verse === this._verse &&
+      verseRef.verse === this.verse &&
       verseRef.versification != null &&
       this.versification != null &&
       verseRef.versification.equals(this.versification)

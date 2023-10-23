@@ -155,4 +155,29 @@ describe('VerseRef', () => {
       expect(vref.versification).toEqual(ScrVers.Septuagint);
     });
   });
+
+  // Tests that don't exist in the C#.
+  describe('Extra (TS-only tests)', () => {
+    it('should convert to empty string', () => {
+      const vref = new VerseRef();
+      expect(vref.toString()).toEqual('');
+    });
+
+    it('should convert to string', () => {
+      const vref = new VerseRef(1, 2, 3, ScrVers.Septuagint);
+      expect(vref.toString()).toEqual('GEN 2:3');
+    });
+
+    it('should confirm when refs are equal', () => {
+      const vref = new VerseRef(1, 2, 3, ScrVers.Septuagint);
+      const vrefClone = vref.clone();
+      expect(vref.equals(vrefClone)).toBe(true);
+    });
+
+    it('should confirm when refs are not equal', () => {
+      const vref = new VerseRef(1, 2, 3, ScrVers.Septuagint);
+      const vrefNotEqual = new VerseRef(1, 20, 3, ScrVers.Septuagint);
+      expect(vref.equals(vrefNotEqual)).toBe(false);
+    });
+  });
 });
