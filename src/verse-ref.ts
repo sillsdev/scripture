@@ -7,6 +7,14 @@ import { Canon } from './canon';
 import { ScrVers } from './scr-vers';
 import { ScrVersType } from './versification';
 
+export interface SerializedVerseRef {
+  book: string;
+  chapterNum: number;
+  verseNum: number;
+  verse?: string;
+  versificationStr?: string;
+}
+
 function splitMulti(str: string, tokens: string[]): string[] {
   // We can use the first token as a temporary join character.
   const tempChar = tokens[0];
@@ -48,16 +56,6 @@ export class VerseRef {
   static ValidStatusType = ValidStatusType;
 
   /**
-   * @deprecated Will be removed in v2. Replace `VerseRef.parse('...')` with `new VerseRef('...')`
-   * or refactor to use `VerseRef.tryParse('...')` which has a different return type.
-   */
-  static parse(verseStr: string, versification: ScrVers = VerseRef.defaultVersification): VerseRef {
-    const vref = new VerseRef(versification);
-    vref.parse(verseStr);
-    return vref;
-  }
-
-  /**
    * Determines if the verse string is in a valid format (does not consider versification).
    */
   static isVerseParseable(verse: string): boolean {
@@ -78,7 +76,7 @@ export class VerseRef {
   static tryParse(str: string): { success: boolean; verseRef: VerseRef } {
     let verseRef: VerseRef;
     try {
-      verseRef = VerseRef.parse(str);
+      verseRef = new VerseRef(str);
       return { success: true, verseRef };
     } catch (error) {
       if (error instanceof VerseRefException) {
@@ -104,6 +102,22 @@ export class VerseRef {
       (chapterNum >= 0 ? (chapterNum % VerseRef.bcvMaxValue) * VerseRef.chapterDigitShifter : 0) +
       (verseNum >= 0 ? verseNum % VerseRef.bcvMaxValue : 0)
     );
+  }
+
+  /**
+   * Deserializes a serialized VerseRef.
+   * @param serializedVerseRef - Serialized VerseRef to create from.
+   * @returns the deserialized VerseRef.
+   */
+  static fromJSON(serializedVerseRef: SerializedVerseRef): VerseRef {
+    const { book, chapterNum, verseNum, verse, versificationStr } = serializedVerseRef;
+    const verseStr = verse ? verse : verseNum.toString();
+    let versification: ScrVers | undefined;
+    if (versificationStr) versification = new ScrVers(versificationStr);
+    const verseRef = book
+      ? new VerseRef(book, chapterNum.toString(), verseStr, versification)
+      : new VerseRef();
+    return verseRef;
   }
 
   /**
@@ -172,7 +186,7 @@ export class VerseRef {
     bookEtc?: number | string | ScrVers | VerseRef,
     chapterEtc?: number | string | ScrVers,
     verse?: number | string,
-    versification?: ScrVers
+    versification?: ScrVers,
   ) {
     if (verse == null && versification == null) {
       if (bookEtc != null && typeof bookEtc === 'string') {
@@ -189,7 +203,7 @@ export class VerseRef {
         this.setEmpty(_versification);
         this._verseNum = bookEtc % VerseRef.chapterDigitShifter;
         this._chapterNum = Math.floor(
-          (bookEtc % VerseRef.bookDigitShifter) / VerseRef.chapterDigitShifter
+          (bookEtc % VerseRef.bookDigitShifter) / VerseRef.chapterDigitShifter,
         );
         this._bookNum = Math.floor(bookEtc / VerseRef.bookDigitShifter);
       } else if (chapterEtc == null) {
@@ -313,7 +327,7 @@ export class VerseRef {
   set bookNum(value: number) {
     if (value <= 0 || value > Canon.lastBook) {
       throw new VerseRefException(
-        'BookNum must be greater than zero and less than or equal to last book'
+        'BookNum must be greater than zero and less than or equal to last book',
       );
     }
     this._bookNum = value;
@@ -467,21 +481,35 @@ export class VerseRef {
     return `${book} ${this.chapter}:${this.verse}`;
   }
 
+  toJSON(): SerializedVerseRef {
+    let verse: string | undefined = this.verse;
+    if (verse === '' || verse === this.verseNum.toString()) verse = undefined;
+    return {
+      book: this.book,
+      chapterNum: this.chapterNum,
+      verseNum: this.verseNum,
+      verse,
+      versificationStr: this.versificationStr,
+    };
+  }
+
   /**
    * Compares this `VerseRef` with supplied one.
    * @param verseRef - object to compare this one to.
-   * @returns `true` if this `VerseRef` is equal to the supplied on, `false` otherwise.
+   * @returns `true` if this `VerseRef` is equal to the supplied one, `false` otherwise.
    */
   equals(verseRef: object): boolean {
     if (!(verseRef instanceof VerseRef)) return false;
+
     return (
       verseRef._bookNum === this._bookNum &&
       verseRef._chapterNum === this._chapterNum &&
       verseRef._verseNum === this._verseNum &&
       verseRef.verse === this.verse &&
-      verseRef.versification != null &&
-      this.versification != null &&
-      verseRef.versification.equals(this.versification)
+      ((verseRef.versification == null && this.versification == null) ||
+        (verseRef.versification != null &&
+          this.versification != null &&
+          verseRef.versification.equals(this.versification)))
     );
   }
 
@@ -504,7 +532,7 @@ export class VerseRef {
   allVerses(
     specifiedVersesOnly = false,
     verseRangeSeparators: string[] = VerseRef.verseRangeSeparators,
-    verseSequenceSeparators: string[] = VerseRef.verseSequenceIndicators
+    verseSequenceSeparators: string[] = VerseRef.verseSequenceIndicators,
   ): VerseRef[] {
     if (this._verse == null || this.chapterNum <= 0) {
       return [this.clone()];
@@ -529,7 +557,7 @@ export class VerseRef {
               this._bookNum,
               this._chapterNum,
               verseNum,
-              this.versification
+              this.versification,
             );
             if (!this.isExcluded) {
               verseRefs.push(verseInRange);
@@ -547,7 +575,7 @@ export class VerseRef {
    */
   validateVerse(
     verseRangeSeparators: string[],
-    verseSequenceSeparators: string[]
+    verseSequenceSeparators: string[],
   ): ValidStatusType {
     if (!this.verse) {
       return this.internalValid;

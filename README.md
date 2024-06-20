@@ -72,8 +72,6 @@ verseRef = new VerseRef();
 `VerseRef` can be used to validate a reference, such as with user form validation:
 
 ```typescript
-import { ScrVers, VerseRef } from '@sillsdev/scripture';
-
 function isVerseReferenceValid(verseStr: string): boolean {
   const { verseRef } = VerseRef.tryParse(verseStr);
   return verseRef.valid;
@@ -82,6 +80,27 @@ function isVerseReferenceValid(verseStr: string): boolean {
 console.log(isVerseReferenceValid('NOOB 200:300')); // false
 console.log(isVerseReferenceValid('GEN 2:3')); // true
 console.log(isVerseReferenceValid('LUK 3:4b-5a')); // true
+```
+
+`VerseRef` can be JSON stringified and deserialized:
+
+```ts
+let verseRef = new VerseRef('LUK', '3', '4b-5a');
+console.log(JSON.stringify(verseRef)); // '{"book":"LUK","chapterNum":3,"verseNum":4,"verse":"4b-5a","versificationStr":"English"}'
+
+verseRef = new VerseRef(1, 2, 3, ScrVers.Septuagint);
+console.log(JSON.stringify(verseRef)); // '{"book":"GEN","chapterNum":2,"verseNum":3,"versificationStr":"Septuagint"}'
+
+verseRef = VerseRef.fromJSON({
+  book: 'LUK',
+  chapterNum: 3,
+  verseNum: 4,
+  verse: '4b-5a',
+  versificationStr: 'English',
+});
+console.log(verseRef.book); // 'LUK'
+console.log(verseRef.chapterNum); // 3
+console.log(verseRef.verse); // '4b-5a'
 ```
 
 Useful properties:
@@ -158,7 +177,7 @@ console.log(Canon.isObsolete(87)); // true
 
 ## Future
 
-v2 might include a more complete port of the C# such that it can be used in a node-based backend.
+v3 might include a more complete port of the C# such that it can be used in a node-based backend.
 
 ## Contributing
 
