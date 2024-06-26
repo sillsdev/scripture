@@ -30,15 +30,17 @@ export class ScrVers {
   private _type?: ScrVersType;
   // private versInfo: Versification;
 
-  constructor(type?: ScrVersType | string) {
-    if (type != null) {
-      if (typeof type === 'string') {
-        this.name = type;
-      } else {
-        this._type = type;
-      }
+  constructor(type: ScrVersType | string | undefined) {
+    if (type == null) {
+      throw new Error('Argument undefined');
+    }
+
+    if (typeof type === 'string') {
+      this.name = type;
+      this._type = ScrVersType[type as keyof typeof ScrVersType];
     } else {
-      throw new Error('Argument null');
+      this._type = type;
+      this.name = ScrVersType[type];
     }
   }
 
