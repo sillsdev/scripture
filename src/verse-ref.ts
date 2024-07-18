@@ -484,13 +484,15 @@ export class VerseRef {
   toJSON(): SerializedVerseRef {
     let verse: string | undefined = this.verse;
     if (verse === '' || verse === this.verseNum.toString()) verse = undefined;
-    return {
+    const json = {
       book: this.book,
       chapterNum: this.chapterNum,
       verseNum: this.verseNum,
       verse,
       versificationStr: this.versificationStr,
     };
+    if (!verse) delete json.verse;
+    return json;
   }
 
   /**

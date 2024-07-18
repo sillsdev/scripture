@@ -187,17 +187,27 @@ describe('VerseRef', () => {
     describe('Serialization', () => {
       it('should serialize empty VerseRef', () => {
         const vref = new VerseRef();
-        expect(vref.toJSON()).toEqual({ book: '', chapterNum: 0, verseNum: 0 });
+
+        const json = vref.toJSON();
+
+        expect(json).toEqual({ book: '', chapterNum: 0, verseNum: 0 });
+        // Needed to help .NET deserialization.
+        expect(json).not.toHaveProperty('verse');
       });
 
       it('should serialize VerseRef', () => {
         const vref = new VerseRef(1, 2, 3, ScrVers.Septuagint);
-        expect(vref.toJSON()).toEqual({
+
+        const json = vref.toJSON();
+
+        expect(json).toEqual({
           book: 'GEN',
           chapterNum: 2,
           verseNum: 3,
           versificationStr: 'Septuagint',
         });
+        // Needed to help .NET deserialization.
+        expect(json).not.toHaveProperty('verse');
       });
 
       it('should stringify VerseRef', () => {
