@@ -111,7 +111,7 @@ export class VerseRef {
    */
   static fromJSON(serializedVerseRef: SerializedVerseRef): VerseRef {
     const { book, chapterNum, verseNum, verse, versificationStr } = serializedVerseRef;
-    const verseStr = verse ? verse : verseNum.toString();
+    const verseStr = verse ?? verseNum.toString();
     let versification: ScrVers | undefined;
     if (versificationStr) versification = new ScrVers(versificationStr);
     const verseRef = book
@@ -243,7 +243,7 @@ export class VerseRef {
         this._bookNum = bookEtc;
         this._chapterNum = chapterEtc;
         this._verseNum = verse;
-        this.versification = versification != null ? versification : VerseRef.defaultVersification;
+        this.versification = versification ?? VerseRef.defaultVersification;
       } else {
         throw new Error('VerseRef constructor not supported.');
       }
@@ -428,7 +428,7 @@ export class VerseRef {
         try {
           const scrVerseCode: number = +parts[1].trim();
           this.versification = new ScrVers(ScrVersType[scrVerseCode]);
-        } catch (error) {
+        } catch {
           throw new VerseRefException('Invalid reference : ' + verseStr);
         }
       }

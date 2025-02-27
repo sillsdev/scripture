@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "include": [
     "src",
-    ".eslintrc.js",
+    "eslint.config.mjs",
     "jest.config.js",
     "vite.config.ts",
     "dts-bundle-generator.config.ts"
