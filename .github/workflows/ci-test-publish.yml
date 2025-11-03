@@ -19,16 +19,24 @@ on:
         required: false
         default: false
 
+permissions:
+  actions: read
+  contents: read
+  pull-requests: read
+  # Required for npm provenance (OIDC)
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5.0.0
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.0.0
         with:
-          node-version: 18
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run lint
       - run: npm run prettier:ci
@@ -40,10 +48,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: npm publish
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '.') }}
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          access: public
-          token: ${{ secrets.NPM_TOKEN }}
+        uses: JS-DevTools/npm-publish@v4.1.1
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Setup tmate session
