@@ -35,7 +35,6 @@ export default [
         ...globals.node,
       },
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       parser: tsParser,
       ecmaVersion: 5,
       sourceType: "commonjs",
