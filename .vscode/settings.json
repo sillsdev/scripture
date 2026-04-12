@@ -6,12 +6,16 @@
 
   "files.eol": "\n",
 
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+
   "json.schemas": [
     {
       "fileMatch": ["*tsconfig*.json"],
       "url": "http://json.schemastore.org/tsconfig"
     }
   ],
+
   "cSpell.words": [
     "bbbccc",
     "bbbcccvvv",
