@@ -1,5 +1,5 @@
 import { ScrVers } from './scr-vers';
-import { SerializedVerseRef, VerseRef } from './verse-ref';
+import { SerializedVerseRef, VerseRef, VerseRefException } from './verse-ref';
 
 describe('VerseRef', () => {
   const RTL_MARKER = '\u200F';
@@ -142,6 +142,58 @@ describe('VerseRef', () => {
     });
   });
 
+  describe('Build VerseRef by Props', () => {
+    it('should build a VerseRef by setting properties', () => {
+      let vref = new VerseRef();
+      vref.versification = ScrVers.English;
+      expect(vref.validStatus).toEqual(VerseRef.ValidStatusType.OutOfRange);
+      expect(vref.BBBCCCVVV).toEqual(0);
+
+      vref.bookNum = 13;
+      // Chapter 0 is out of range in the C#, but `internalValid()` can't detect that until the
+      // versification port lands (see the TODO in `verse-ref.ts`).
+      // expect(vref.validStatus).toEqual(VerseRef.ValidStatusType.OutOfRange);
+      expect(vref.BBBCCCVVV).toEqual(13000000);
+      expect(vref.bookNum).toEqual(13);
+      expect(vref.chapterNum).toEqual(0);
+      expect(vref.verseNum).toEqual(0);
+
+      vref.chapterNum = 1;
+      vref.verseNum = 0;
+      expect(vref.valid).toBe(true);
+      expect(vref.BBBCCCVVV).toEqual(13001000);
+      expect(vref.bookNum).toEqual(13);
+      expect(vref.chapterNum).toEqual(1);
+      expect(vref.verseNum).toEqual(0);
+
+      vref.chapterNum = 14;
+      vref.verseNum = 15;
+      expect(vref.valid).toBe(true);
+      expect(vref.BBBCCCVVV).toEqual(13014015);
+      expect(vref.bookNum).toEqual(13);
+      expect(vref.chapterNum).toEqual(14);
+      expect(vref.verseNum).toEqual(15);
+
+      vref = new VerseRef();
+      vref.versification = ScrVers.English;
+      vref.chapterNum = 16;
+      expect(vref.validStatus).toEqual(VerseRef.ValidStatusType.OutOfRange);
+      expect(vref.BBBCCCVVV).toEqual(16000);
+      expect(vref.bookNum).toEqual(0);
+      expect(vref.chapterNum).toEqual(16);
+      expect(vref.verseNum).toEqual(0);
+
+      vref = new VerseRef();
+      vref.versification = ScrVers.English;
+      vref.verseNum = 17;
+      expect(vref.validStatus).toEqual(VerseRef.ValidStatusType.OutOfRange);
+      expect(vref.BBBCCCVVV).toEqual(17);
+      expect(vref.bookNum).toEqual(0);
+      expect(vref.chapterNum).toEqual(0);
+      expect(vref.verseNum).toEqual(17);
+    });
+  });
+
   describe('Chapter and Verse as Empty Strings', () => {
     it('should handle empty chapter and verse', () => {
       const vref = new VerseRef('LUK', '', '', ScrVers.Septuagint);
@@ -158,6 +210,21 @@ describe('VerseRef', () => {
 
   // Tests that don't exist in the C#.
   describe('Extra (TS-only tests)', () => {
+    describe('Property setters', () => {
+      it('should throw when chapterNum is negative', () => {
+        const vref = new VerseRef('LUK 3:4', ScrVers.English);
+        expect(() => {
+          vref.chapterNum = -1;
+        }).toThrow(VerseRefException);
+      });
+
+      it('should not throw when chapterNum is zero', () => {
+        const vref = new VerseRef('LUK 3:4', ScrVers.English);
+        vref.chapterNum = 0;
+        expect(vref.chapterNum).toEqual(0);
+      });
+    });
+
     describe('String', () => {
       it('should convert to empty string', () => {
         const vref = new VerseRef();
