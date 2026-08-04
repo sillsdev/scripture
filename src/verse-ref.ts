@@ -340,8 +340,10 @@ export class VerseRef {
     return this._chapterNum;
   }
   set chapterNum(value: number) {
-    // ToDo: replace or remove this placeholder
-    this.chapterNum = value;
+    if (value < 0) {
+      throw new VerseRefException('ChapterNum can not be negative');
+    }
+    this._chapterNum = value;
   }
 
   /**
