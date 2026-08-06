@@ -353,8 +353,11 @@ export class VerseRef {
     return this._verseNum;
   }
   set verseNum(value: number) {
-    // ToDo: replace or remove this placeholder
+    if (value < 0) {
+      throw new VerseRefException('VerseNum can not be negative');
+    }
     this._verseNum = value;
+    this._verse = undefined;
   }
 
   /**

@@ -138,9 +138,6 @@ porting a test — several `VerseRefTests` cases can't pass yet, and it's not ob
   needs `Versification.getLastBook/getLastChapter/getLastVerse`, which needs the `.vrs`
   versification data ported — see the stalled `improve-verseref` branch.
 - **`VerseRef.isExcluded`** is hardcoded `return false` with a `TODO`.
-- **`VerseRef.set verseNum`** is a mis-port still carrying a `ToDo`: it assigns the backing field
-  but omits the C# negative guard _and_ the `verse = null` that clears a range string. So setting
-  `verseNum` on `'LUK 3:4b-5a'` leaves a stale `'4b-5a'` in the `verse` getter.
 - **`BBBCCCVVVS`** is declared but not implemented.
 - **The numeric constructor bypasses the setters**, assigning `_bookNum`/`_chapterNum`/`_verseNum`
   directly. So the C# `Invalid` test's constructor-throws cases (e.g. `new VerseRef(2, -42, 1)`)
