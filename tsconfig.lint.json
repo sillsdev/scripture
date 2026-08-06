@@ -1,4 +1,10 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src", "eslint.config.mjs", "vite.config.ts", "dts-bundle-generator.config.ts"]
+  "include": [
+    "src",
+    "eslint.config.mjs",
+    "vite.config.ts",
+    "dts-bundle-generator.config.ts",
+    "scripts/**/*.mjs"
+  ]
 }
