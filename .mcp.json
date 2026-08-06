@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["scripts/mcp-launcher.mjs", "-y", "@upstash/context7-mcp@latest"]
+    }
+  }
+}

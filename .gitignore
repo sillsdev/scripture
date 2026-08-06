@@ -132,7 +132,20 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Claude Code
+# Claude Code - files that are supposed to be local-only and not shared with the team
 .claude/settings.local.json
 .claude/todos/
 .claude/memory/
+.claude/worktrees
+.superpowers
+docs/superpowers
+.claude/*
+# settings.json and skills/ are shared team config (tracked in git), so keep them out of the
+# .claude ignore above. The /* glob (rather than a bare `.claude`) is what lets these negations
+# re-include the paths.
+#
+# NOTE `.claude/*` ignores EVERYTHING else under .claude/, including paths that would be shared team
+# config if you added them — e.g. agents/, commands/, hooks/. If you add one, add a negation here
+# too, or it will silently never be committed.
+!.claude/settings.json
+!.claude/skills/
