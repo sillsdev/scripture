@@ -223,6 +223,40 @@ describe('VerseRef', () => {
         vref.chapterNum = 0;
         expect(vref.chapterNum).toEqual(0);
       });
+
+      it('should throw when verseNum is negative', () => {
+        const vref = new VerseRef('LUK 3:4', ScrVers.English);
+        expect(() => {
+          vref.verseNum = -1;
+        }).toThrow(VerseRefException);
+      });
+
+      it('should not throw when verseNum is zero', () => {
+        const vref = new VerseRef('LUK 3:4', ScrVers.English);
+        vref.verseNum = 0;
+        expect(vref.verseNum).toEqual(0);
+      });
+
+      it('should clear a verse range when verseNum is set', () => {
+        const vref = new VerseRef('LUK', '3', '4b-5a', ScrVers.English);
+        expect(vref.verse).toEqual('4b-5a');
+        expect(vref.hasMultiple).toBe(true);
+
+        vref.verseNum = 9;
+
+        expect(vref.verseNum).toEqual(9);
+        expect(vref.verse).toEqual('9');
+        expect(vref.hasMultiple).toBe(false);
+      });
+
+      it('should clear a verse segment when verseNum is set', () => {
+        const vref = new VerseRef('LUK', '3', '4b', ScrVers.English);
+        expect(vref.verse).toEqual('4b');
+
+        vref.verseNum = 9;
+
+        expect(vref.verse).toEqual('9');
+      });
     });
 
     describe('String', () => {
